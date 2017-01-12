@@ -10,6 +10,7 @@ body {
 button {
     border: none;
     border-radius: 5px;
+    margin: 0 5px 0 5px;
     font-weight: bolder;
     color: #ffffff;
     padding: 0.7rem;
@@ -33,12 +34,20 @@ header h1 {
     margin: 0;
 }
 
-.list_controls_container {
+.list_info_container {
     padding: 0.7rem 0 0.7rem 0.7rem;
 }
 
-.add_channel_form_container {
+.new_channel_form form {
     display: inline-block;
+}
+
+.channels_number_info {
+    margin: 0 0 5px 5px;
+}
+
+.add_channel_form_container {
+    width: 100%;
     margin: 0 5px 0 5px;
     padding: 0 5px 0 5px;
     vertical-align: middle;
@@ -46,6 +55,10 @@ header h1 {
 
 .add_channel_form_container.hidden {
     display: none;
+}
+
+.add_channel_form_container button {
+
 }
 
 .add_channel_form_container input {
@@ -105,8 +118,8 @@ header h1 {
     align-content: center;
 }
 
+button.success,
 button.add {
-    margin-left: 1rem;
     background-color: #51ad47;
 }
 

@@ -12,15 +12,23 @@
 
     <h1>RSS Channels List</h1>
 
-    <div class="list_controls_container">
+    <div class="list_info_container">
+        <div class="channels_number_info">
         <span>Channels in your list: </span><span class="channels_number"></span>
+        </div>
+        <div class="list_controls_container">
         <button class="add" onclick="RSSChannelsApp.RSSList.onAddChannel()">Add channel</button>
-
+        </div>
         <div class="add_channel_form_container hidden">
-            <input name="channelName" placeholder="New channel name">
-            <input name="channelUrl" placeholder="New channel url">
-            <button class="add" onclick="RSSChannelsApp.RSSList.addChannel()">Ok</button>
-            <button class="cancel" onclick="RSSChannelsApp.RSSList.onCancelAddChannel()">Cancel</button>
+            <div class="new_channel_form">
+                <input type="text" name="newChannelName" placeholder="New channel name" autofocus required>
+                <input type="url" name="newChannelUrl" placeholder="New channel url" required>
+
+                <button class="success" onclick="RSSChannelsApp.RSSList.addChannel()">Ok</button>
+                <button class="cancel" onclick="RSSChannelsApp.RSSList.onCancelAddChannel()">Cancel</button>
+                <span class="add_channel_msg"></span>
+            </div>
+
         </div>
     </div>
 
