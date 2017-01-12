@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://static.sekandocdn.net/static/feednami/feednami-client-v1.1.js"></script>
+
+    <title>RSS channels list</title>
+</head>
+<body>
+<header>
+
+    <h1>RSS Channels List</h1>
+
+    <div class="list_controls_container">
+        <span>Channels in your list: </span><span class="channels_number"></span>
+        <button class="add" onclick="RSSChannelsApp.RSSList.onAddChannel()">Add channel</button>
+
+        <div class="add_channel_form_container hidden">
+            <input name="channelName" placeholder="New channel name">
+            <input name="channelUrl" placeholder="New channel url">
+            <button class="add" onclick="RSSChannelsApp.RSSList.addChannel()">Ok</button>
+            <button class="cancel" onclick="RSSChannelsApp.RSSList.onCancelAddChannel()">Cancel</button>
+        </div>
+    </div>
+
+
+</header>
+
+<main>
+
+    <div class="channels_list">
+    </div>
+
+    <div class="channel_statistic">
+        <h2>Channel statistic</h2>
+        <span>Messages number:</span>
+        <span>Messages authors:</span>
+    </div>
+
+
+    <div class="messages_list">
+        <div class="message_item">
+            <div class="message_title"><span>name 11</span></div>
+            <div class="message_controls_container">
+                <button class="statistic">Statistic</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="message_statistic">
+        Message statistic (diagram)
+    </div>
+</main>
+<footer></footer>
+
+<template class="channel_item_template">
+    <div class="channel_item" onclick="RSSChannelsApp.RSSList.onChannelItemClick(this)">
+        <div class="channel_name_container"><span class="channel_name"></span></div>
+
+        <button class="remove" onclick="RSSChannelsApp.RSSList.onChannelRemove(event, this)">Remove</button>
+        <button class="edit" onclick="RSSChannelsApp.RSSList.onChannelEdit(event, this)">Edit</button>
+        <button class="statistic" onclick="RSSChannelsApp.RSSList.onChannelStatistic(event, this)">Statistic
+        </button>
+
+    </div>
+</template>
+
+</body>
+<script src="scripts/Feeds.js" async></script>
+<script src="scripts/RSSChannelsList.js" async></script>
+
+</html>
