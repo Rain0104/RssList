@@ -16,6 +16,10 @@ button {
     padding: 0.7rem;
 }
 
+/*button.hidden{*/
+    /*display: none;*/
+/*}*/
+
 main {
     width: 100%;
     height: 100%;
@@ -32,6 +36,13 @@ header h1 {
     text-align: center;
     padding: 0.7rem;
     margin: 0;
+}
+
+input {
+    height: 1.5rem;
+    margin: 0 5px 0 5px;
+    border: none;
+    border-radius: 5px;
 }
 
 .list_info_container {
@@ -53,23 +64,8 @@ header h1 {
     vertical-align: middle;
 }
 
-.add_channel_form_container.hidden {
-    display: none;
-}
-
-.add_channel_form_container button {
-
-}
-
-.add_channel_form_container input {
-    height: 1.5rem;
-    margin: 0 5px 0 5px;
-    border: none;
-    border-radius: 5px;
-}
-
 .channels_list,
-.messages_list {
+.feeds_list {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -78,7 +74,7 @@ header h1 {
 }
 
 .channel_statistic,
-.message_statistic {
+.feed_statistic {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -87,7 +83,7 @@ header h1 {
 }
 
 .channels_list .channel_item,
-.messages_list .message_item {
+.feeds_list .feed_item {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -97,7 +93,7 @@ header h1 {
 }
 
 .channels_list .channel_item:hover,
-.messages_list .message_item:hover {
+.feeds_list .feed_item:hover {
     background-color: #aea3cc;
 }
 
@@ -107,13 +103,13 @@ header h1 {
 }
 
 .channel_name_container,
-.message_name_container {
+.feed_name_container {
     width: 40%;
     align-content: center;
 }
 
-.channel_controls_container,
-.message_controls_container {
+.channel_controls ,
+.feed_controls_container {
     width: 60%;
     align-content: center;
 }
@@ -121,10 +117,6 @@ header h1 {
 button.success,
 button.add {
     background-color: #51ad47;
-}
-
-button.add.hidden {
-    display: none;
 }
 
 button.edit {
@@ -141,4 +133,8 @@ button.cancel {
 
 button.statistic {
     background-color: #8d52d1;
+}
+
+.hidden {
+    display: none;
 }

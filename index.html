@@ -14,10 +14,10 @@
 
     <div class="list_info_container">
         <div class="channels_number_info">
-        <span>Channels in your list: </span><span class="channels_number"></span>
+            <span>Channels in your list: </span><span class="channels_number"></span>
         </div>
         <div class="list_controls_container">
-        <button class="add" onclick="RSSChannelsApp.RSSList.onAddChannel()">Add channel</button>
+            <button class="add" onclick="RSSChannelsApp.RSSList.onAddChannel()">Add channel</button>
         </div>
         <div class="add_channel_form_container hidden">
             <div class="new_channel_form">
@@ -47,30 +47,39 @@
     </div>
 
 
-    <div class="messages_list">
-        <div class="message_item">
-            <div class="message_title"><span>name 11</span></div>
-            <div class="message_controls_container">
-                <button class="statistic">Statistic</button>
-            </div>
-        </div>
-    </div>
+    <!--<div class="feeds_list">-->
+        <!--<div class="feed_item">-->
+            <!--<div class="feed_title"><span>name 11</span></div>-->
+            <!--<div class="feed_controls_container">-->
+                <!--<button class="statistic">Statistic</button>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
 
 
-    <div class="message_statistic">
-        Message statistic (diagram)
-    </div>
+    <!--<div class="feed_statistic">-->
+        <!--Message statistic (diagram)-->
+    <!--</div>-->
 </main>
 <footer></footer>
 
 <template class="channel_item_template">
-    <div class="channel_item" onclick="RSSChannelsApp.RSSList.onChannelItemClick(this)">
-        <div class="channel_name_container"><span class="channel_name"></span></div>
+    <div class="channel_item">
+        <div class="channel_name_container" onclick="RSSChannelsApp.RSSList.onChannelItemClick(this)"><span class="channel_name"></span></div>
+        <div class="channel_controls">
+            <button class="remove" onclick="RSSChannelsApp.RSSList.onChannelRemove(event, this)">Remove</button>
+            <button class="edit" onclick="RSSChannelsApp.RSSList.onChannelEdit(event, this)">Edit</button>
+            <button class="statistic" onclick="RSSChannelsApp.RSSList.onChannelStatistic(event, this)">Statistic
+            </button>
+        </div>
+        <div class="edit_channel_form hidden">
+            <input type="text" name="editChannelName" placeholder="Channel name" autofocus required>
+            <input type="url" name="editChannelUrl" placeholder="Channel url" required>
 
-        <button class="remove" onclick="RSSChannelsApp.RSSList.onChannelRemove(event, this)">Remove</button>
-        <button class="edit" onclick="RSSChannelsApp.RSSList.onChannelEdit(event, this)">Edit</button>
-        <button class="statistic" onclick="RSSChannelsApp.RSSList.onChannelStatistic(event, this)">Statistic
-        </button>
+            <button class="success" onclick="RSSChannelsApp.RSSList.editChannel(event)">Ok</button>
+            <button class="cancel" onclick="RSSChannelsApp.RSSList.onEditCancel(event)">Cancel</button>
+            <span class="edit_channel_msg"></span>
+        </div>
 
     </div>
 </template>
