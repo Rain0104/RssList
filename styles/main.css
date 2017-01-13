@@ -1,6 +1,6 @@
 body {
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
     font-family: sans-serif;
     color: #6b49ad;
     margin: 0;
@@ -16,18 +16,17 @@ button {
     padding: 0.7rem;
 }
 
-/*button.hidden{*/
-/*display: none;*/
-/*}*/
-
 main {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 78vh;
     display: flex;
     flex-direction: row;
+    background-color: #bbbbbb;
 }
 
 header {
+    width: 100vw;
+    height: 22vh;
     background-color: #7a3fa0;
     color: #ffffff;
 }
@@ -80,12 +79,16 @@ input {
     flex-direction: column;
     flex-wrap: wrap;
     background-color: #bbbbbb;
-    width: 60%;
 }
-
+.statistic_header h2,
 .statistic_header {
+    display: inline-block;
     color: #ffffff;
     margin: 5px 0 5px 5px;
+}
+
+.statistic_header button{
+float: right;
 }
 
 .statistic {
@@ -99,6 +102,10 @@ input {
 .channel_statistic_message {
     color: #565756;
     margin: 5px 0 5px 5px;
+}
+.feed_list,
+.channels_list{
+    overflow-y: auto;
 }
 
 .channels_list .channel_item,
@@ -148,6 +155,7 @@ button.remove {
     background-color: #d2304a;
 }
 
+button.close,
 button.cancel {
     background-color: #d2c243;
 }

@@ -261,15 +261,12 @@
         },
 
         onChannelStatisticClose: function () {
-            this.channelMessagesNumber = '';
-            this.channelMessagesAuthors = '';
-            this.channelStatisticContainer.classList.remove('add');
+            this.channelStatisticContainer.classList.add('hidden');
         },
 
         hideChannelMessage: function () {
             this.channelMessage.textContent = '';
         },
-
 
         showChannelMessage: function (msg) {
             this.channelMessage.textContent = msg;

@@ -32,7 +32,6 @@
         </div>
     </div>
 
-
 </header>
 
 <main>
@@ -40,9 +39,11 @@
     <div class="channels_list">
     </div>
 
-
     <div class="channel_statistic_container hidden">
-        <h2 class="statistic_header">Channel statistic</h2>
+        <div class="statistic_header">
+            <h2>Channel statistic</h2>
+            <button class="close" onclick="RSSChannelsApp.RSSList.onChannelStatisticClose()">X</button>
+        </div>
         <div class="statistic">
             <p>Feeds number: <span class="channel_feeds_number"></span></p>
             <p>Feeds authors: <span class="channel_feeds_authors"></span></p>
@@ -52,8 +53,8 @@
 
     <div class="feeds_list">
         <p class="feed_message"></p>
-    </div>
 
+    </div>
 
     <!--<div class="feed_statistic_container">-->
     <!--Message statistic (diagram)-->
