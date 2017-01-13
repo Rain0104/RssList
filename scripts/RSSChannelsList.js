@@ -7,18 +7,19 @@
         this.addChannelFormContainer = document.querySelector('.add_channel_form_container');
         this.channelsNumberContainer = document.querySelector('.channels_number');
         this.channelTemplate = document.querySelector('.channel_item_template');
+        this.feedTemplate = document.querySelector('.feed_item_template');
+        this.feedMessage = document.querySelector('.feed_message');
+        this.channelStatisticContainer = document.querySelector('.channel_statistic_container');
+        this.channelStatisticInfo = document.querySelector('.statistic');
+        this.channelMessage = document.querySelector('.channel_statistic_message');
+        this.channelFeedsNumber = document.querySelector('.channel_feeds_number');
+        this.channelFeedsAuthors = document.querySelector('.channel_feeds_authors');
         this.addChannelButton = document.querySelector('.add');
         this.addChannelMessage = document.querySelector('.add_channel_msg');
-        this.editChannelMessage = document.querySelector('.edit_channel_msg');
-
         this.addChannelForm = document.querySelector('.new_channel_form');
         this.newChannelNameInput = this.addChannelForm.querySelector('input[name="newChannelName"]');
         this.newChannelUrlInput = this.addChannelForm.querySelector('input[name="newChannelUrl"]');
-
-
-        this.activeChannel = {};
-        this.activeMessage = {};
-
+        this.activeFeeds = {};
         this.defaultRSSList = [
             {title: 'Mozzila Hacks', url: 'http://hacks.mozilla.org/feed/'},
             {title: 'Lea Verou', url: 'http://feeds2.feedburner.com/leaverou'},
@@ -30,16 +31,14 @@
 
     RSSList.prototype = {
         init: function () {
-            // localStorage.clear();
+            localStorage.clear();
             var rssList = localStorage.getItem('rssChannelsList');
             if (rssList) {
                 this.activeChannelsList = JSON.parse(rssList);
-
             } else {
                 localStorage.setItem('rssChannelsList', JSON.stringify(this.defaultRSSList));
                 this.activeChannelsList = this.defaultRSSList;
             }
-
             this.showChannelsNumber();
             this.showChannelsList();
         },
@@ -58,29 +57,54 @@
         },
 
         createChannelItem: function (channelInfo) {
+            var channelItem = this.channelTemplate.content.querySelector('.channel_item');
             var channelName = this.channelTemplate.content.querySelector('.channel_name');
             var channelNameContainer = this.channelTemplate.content.querySelector('.channel_name_container');
             var channelRemoveButton = this.channelTemplate.content.querySelector('.remove');
             var channelEditButton = this.channelTemplate.content.querySelector('.edit');
             var channelStatisticButton = this.channelTemplate.content.querySelector('.statistic');
             channelName.textContent = channelInfo.title;
+            channelItem.setAttribute('data-channel-url', channelInfo.url);
+            channelItem.setAttribute('data-channel-title', channelInfo.title);
             channelNameContainer.setAttribute('data-channel-url', channelInfo.url);
             channelNameContainer.setAttribute('data-channel-title', channelInfo.title);
             channelRemoveButton.setAttribute('data-channel-title', channelInfo.title);
             channelEditButton.setAttribute('data-channel-title', channelInfo.title);
             channelEditButton.setAttribute('data-channel-url', channelInfo.url);
-            channelStatisticButton.setAttribute('data-channel-title', channelInfo.title);
-
+            channelStatisticButton.setAttribute('data-channel-url', channelInfo.url);
             var clone = document.importNode(this.channelTemplate.content, true);
-
             this.listContainer.appendChild(clone);
         },
 
         onChannelItemClick: function (channelItem) {
+            var than = this;
             var url = channelItem.getAttribute('data-channel-url');
             var title = channelItem.getAttribute('data-channel-title');
+
             var feeds = this.feednamiComponent.loadFeed(url);
-            this.activeChannel = {title: title, feeds: feeds};
+            this.hideFeedMessage();
+            feeds.then(function (res) {
+                var len = res.length;
+                for (var i = 0; i < len; i++) {
+                    var feed = res[i];
+                    than.createFeedItem(feed);
+                }
+            }).catch(function (err) {
+                than.showFeedMessage(err);
+            });
+        },
+
+        hideFeedMessage: function () {
+            this.feedMessage.textContent = '';
+        },
+
+        showFeedMessage: function (err) {
+            console.log(err);
+            this.feedMessage.textContent = err;
+        },
+
+        createFeedItem: function (feed) {
+            console.log(feed);
         },
 
         updateChannelsList: function () {
@@ -113,7 +137,6 @@
             this.newChannelNameInput.value = '';
             this.newChannelUrlInput.value = '';
             this.addChannelMessage.textContent = '';
-
             this.addChannelFormContainer.classList.add('hidden');
             this.addChannelButton.classList.remove('hidden');
         },
@@ -157,7 +180,6 @@
         },
 
         onChannelEdit: function (event, channelItem) {
-            event.stopPropagation();
             var title = channelItem.getAttribute('data-channel-title');
             var url = channelItem.getAttribute('data-channel-url');
             var controlsContainer = event.target.parentNode;
@@ -165,8 +187,6 @@
             var titleContainer = controlsContainer.parentNode.querySelector('.channel_name_container');
             var editTitleInput = form.querySelector('input[name="editChannelName"]');
             var editUrlInput = form.querySelector('input[name="editChannelUrl"]');
-            var index = this.findChannel(title);
-            this.activeChannel = {title: title, url: url, index: index};
             editTitleInput.value = title;
             editUrlInput.value = url;
             titleContainer.classList.add('hidden');
@@ -188,8 +208,6 @@
             titleContainer.classList.remove('hidden');
             controlsContainer.classList.remove('hidden');
             form.classList.add('hidden');
-            this.activeChannel = {};
-
         },
 
         editChannel: function (event) {
@@ -201,29 +219,76 @@
             var editTitleInput = form.querySelector('input[name="editChannelName"]');
             var editUrlInput = form.querySelector('input[name="editChannelUrl"]');
             var msgContainer = form.querySelector('.edit_channel_msg');
+            var channelItem = form.parentNode;
             var updatedChannel = {title: editTitleInput.value, url: editUrlInput.value};
+            channelItem.setAttribute('data-channel-title', updatedChannel.title);
+            channelItem.setAttribute('data-channel-url', updatedChannel.url);
             msgContainer.textContent = '';
             if (this.validateChannelInputsValues(updatedChannel, msgContainer)) {
                 title.textContent = editTitleInput.value;
-                console.log(this.activeChannelsList);
                 this.activeChannelsList.splice(this.activeChannel.index, 1, updatedChannel);
-                console.log(this.activeChannelsList);
                 this.updateChannelsList();
+                titleContainer.setAttribute('data-channel-url', updatedChannel.url);
+                titleContainer.setAttribute('data-channel-title', updatedChannel.title);
                 editTitleInput.value = '';
                 editUrlInput.value = '';
                 titleContainer.classList.remove('hidden');
                 controlsContainer.classList.remove('hidden');
                 form.classList.add('hidden');
-                this.activeChannel = {};
             }
         },
 
 
-        onChannelStatistic: function (event, title) {
-            this.channelStatistic = {feedsNumber: this.activeChannel.feeds.length};
+        onChannelStatistic: function (event, channelItem) {
+            var that = this;
+            var url = channelItem.getAttribute('data-channel-url');
+            var feeds = this.feednamiComponent.loadFeed(url);
+            this.hideChannelMessage();
+            that.channelFeedsNumber.textContent = '';
+            that.channelFeedsAuthors.textContent = '';
+            this.channelStatisticInfo.classList.add('hidden');
+            this.channelStatisticContainer.classList.remove('hidden');
+            feeds.then(function (res) {
+                var authorsNumber = that.getChannelAuthors(res);
+                var feedsNumber = res.length;
+                that.channelStatisticInfo.classList.remove('hidden');
+                that.channelStatisticContainer = document.querySelector('.channel_statistic_container');
+                that.channelFeedsNumber.textContent = feedsNumber;
+                that.channelFeedsAuthors.textContent = authorsNumber
+            }).catch(function (err) {
+                that.showChannelMessage(err.message);
+            });
         },
 
-        getChannelAuthors: function () {
+        onChannelStatisticClose: function () {
+            this.channelMessagesNumber = '';
+            this.channelMessagesAuthors = '';
+            this.channelStatisticContainer.classList.remove('add');
+        },
+
+        hideChannelMessage: function () {
+            this.channelMessage.textContent = '';
+        },
+
+
+        showChannelMessage: function (msg) {
+            this.channelMessage.textContent = msg;
+        },
+
+        onFeedStatistic: function (event, title) {
+
+        },
+
+        getChannelAuthors: function (feeds) {
+            var len = feeds.length;
+            var authorsArray = [];
+            for (var i = 0; i < len; i++) {
+                var author = feeds[i].author;
+                if (authorsArray.indexOf(author) === -1) {
+                    authorsArray.push(author);
+                }
+            }
+            return authorsArray.length;
         }
     };
 

@@ -8,20 +8,18 @@
     Feed.prototype = {
 
         loadFeed: function (url) {
-            this.feednami.load(url, function (result) {
-                if (result.error) {
-                    console.log(result.error);
-                    return result;
-
-                } else {
-                    var entries = result.feed.entries;
-                    for (var i = 0; i < entries.length; i++) {
-                        var entry = entries[i];
-                        console.log(entry.title);
+            var that = this;
+            var promise = new Promise(function (resolve, reject) {
+                that.feednami.load(url, function (result) {
+                    if (result.error) {
+                        console.log(result.error);
+                        reject(result.error);
+                    } else {
+                        resolve(result.feed.entries);
                     }
-                    return entries;
-                }
-            })
+                });
+            });
+            return promise;
         }
     };
 

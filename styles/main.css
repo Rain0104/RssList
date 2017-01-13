@@ -17,7 +17,7 @@ button {
 }
 
 /*button.hidden{*/
-    /*display: none;*/
+/*display: none;*/
 /*}*/
 
 main {
@@ -46,6 +46,7 @@ input {
 }
 
 .list_info_container {
+    background-color: #9e9e9e;
     padding: 0.7rem 0 0.7rem 0.7rem;
 }
 
@@ -69,31 +70,45 @@ input {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    flex-grow: 2;
     background-color: #cccccc;
+    width: 40%;
 }
 
-.channel_statistic,
-.feed_statistic {
+.channel_statistic_container,
+.channel_statistic_container {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    flex-grow: 3;
     background-color: #bbbbbb;
+    width: 60%;
+}
+
+.statistic_header {
+    color: #ffffff;
+    margin: 5px 0 5px 5px;
+}
+
+.statistic {
+    margin: 0 5px 5px 5px;
+}
+
+.statistic p {
+    margin: 5px 0 5px 0;
+}
+
+.channel_statistic_message {
+    color: #565756;
+    margin: 5px 0 5px 5px;
 }
 
 .channels_list .channel_item,
 .feeds_list .feed_item {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: baseline;
     padding: 5px 0 5px 5px;
     border-bottom: 1px solid #9e9e9e;
 }
 
-.channels_list .channel_item:hover,
-.feeds_list .feed_item:hover {
+.channel_item:hover,
+.feed_item:hover {
     background-color: #aea3cc;
 }
 
@@ -104,14 +119,20 @@ input {
 
 .channel_name_container,
 .feed_name_container {
-    width: 40%;
+    display: inline-block;
+    width: 30%;
     align-content: center;
 }
 
-.channel_controls ,
+.channel_controls,
 .feed_controls_container {
-    width: 60%;
+    float: right;
+    display: inline-block;
     align-content: center;
+}
+
+.edit_channel_form {
+    width: 100%;
 }
 
 button.success,

@@ -40,32 +40,31 @@
     <div class="channels_list">
     </div>
 
-    <div class="channel_statistic">
-        <h2>Channel statistic</h2>
-        <span>Messages number:</span>
-        <span>Messages authors:</span>
+
+    <div class="channel_statistic_container hidden">
+        <h2 class="statistic_header">Channel statistic</h2>
+        <div class="statistic">
+            <p>Feeds number: <span class="channel_feeds_number"></span></p>
+            <p>Feeds authors: <span class="channel_feeds_authors"></span></p>
+        </div>
+        <span class="channel_statistic_message"></span>
+    </div>
+
+    <div class="feeds_list">
+        <p class="feed_message"></p>
     </div>
 
 
-    <!--<div class="feeds_list">-->
-        <!--<div class="feed_item">-->
-            <!--<div class="feed_title"><span>name 11</span></div>-->
-            <!--<div class="feed_controls_container">-->
-                <!--<button class="statistic">Statistic</button>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-
-
-    <!--<div class="feed_statistic">-->
-        <!--Message statistic (diagram)-->
+    <!--<div class="feed_statistic_container">-->
+    <!--Message statistic (diagram)-->
     <!--</div>-->
 </main>
 <footer></footer>
 
 <template class="channel_item_template">
     <div class="channel_item">
-        <div class="channel_name_container" onclick="RSSChannelsApp.RSSList.onChannelItemClick(this)"><span class="channel_name"></span></div>
+        <div class="channel_name_container" onclick="RSSChannelsApp.RSSList.onChannelItemClick(this)"><span
+                class="channel_name"></span></div>
         <div class="channel_controls">
             <button class="remove" onclick="RSSChannelsApp.RSSList.onChannelRemove(event, this)">Remove</button>
             <button class="edit" onclick="RSSChannelsApp.RSSList.onChannelEdit(event, this)">Edit</button>
@@ -81,6 +80,15 @@
             <span class="edit_channel_msg"></span>
         </div>
 
+    </div>
+</template>
+
+<template class="feed_item_template">
+    <div class="feed_name_container" onclick="RSSChannelsApp.RSSList.onFeedStatistic(event, this)">
+        <span class="feed_name"></span>
+    </div>
+    <div class="feed_content_container">
+        <span class="feed_content"></span>
     </div>
 </template>
 
