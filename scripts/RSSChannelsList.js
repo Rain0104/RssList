@@ -4,6 +4,8 @@
         this.feednamiComponent = window.RSSChannelsApp.Feednami;
         this.activeChannelsList = [];
         this.listContainer = document.querySelector('.channels_list');
+        this.feedsContainer = document.querySelector('.feeds_list_container');
+        this.feedsList = document.querySelector('.feeds_list');
         this.addChannelFormContainer = document.querySelector('.add_channel_form_container');
         this.channelsNumberContainer = document.querySelector('.channels_number');
         this.channelTemplate = document.querySelector('.channel_item_template');
@@ -11,6 +13,7 @@
         this.feedMessage = document.querySelector('.feed_message');
         this.channelStatisticContainer = document.querySelector('.channel_statistic_container');
         this.channelStatisticInfo = document.querySelector('.statistic');
+        this.channelStatisticTitle = document.querySelector('.channel_statistic_title');
         this.channelMessage = document.querySelector('.channel_statistic_message');
         this.channelFeedsNumber = document.querySelector('.channel_feeds_number');
         this.channelFeedsAuthors = document.querySelector('.channel_feeds_authors');
@@ -20,6 +23,7 @@
         this.newChannelNameInput = this.addChannelForm.querySelector('input[name="newChannelName"]');
         this.newChannelUrlInput = this.addChannelForm.querySelector('input[name="newChannelUrl"]');
         this.activeFeeds = {};
+        this.activeChannel = {};
         this.defaultRSSList = [
             {title: 'Mozzila Hacks', url: 'http://hacks.mozilla.org/feed/'},
             {title: 'Lea Verou', url: 'http://feeds2.feedburner.com/leaverou'},
@@ -72,26 +76,53 @@
             channelEditButton.setAttribute('data-channel-title', channelInfo.title);
             channelEditButton.setAttribute('data-channel-url', channelInfo.url);
             channelStatisticButton.setAttribute('data-channel-url', channelInfo.url);
+            channelStatisticButton.setAttribute('data-channel-title', channelInfo.title);
             var clone = document.importNode(this.channelTemplate.content, true);
             this.listContainer.appendChild(clone);
         },
 
+        createFeedItem: function (feed, index) {
+            var feedITitle = this.feedTemplate.content.querySelector('.feed_title');
+            var feedIAuthor = this.feedTemplate.content.querySelector('.feed_author');
+            var feedIContent = this.feedTemplate.content.querySelector('.feed_content_container');
+            var feedStatisticButton = this.feedTemplate.content.querySelector('.statistic');
+
+            feedStatisticButton.setAttribute('data-feed-index', index);
+            feedITitle.textContent = feed.title;
+            feedIAuthor.textContent = feed.author;
+            this.removeContent(feedIContent);
+            feedIContent.innerHTML += feed.summary;
+            var clone = document.importNode(this.feedTemplate.content, true);
+            this.feedsList.appendChild(clone);
+        },
+
         onChannelItemClick: function (channelItem) {
-            var than = this;
+            var that = this;
             var url = channelItem.getAttribute('data-channel-url');
             var title = channelItem.getAttribute('data-channel-title');
-
+            this.removeContent(this.feedsList);
             var feeds = this.feednamiComponent.loadFeed(url);
             this.hideFeedMessage();
             feeds.then(function (res) {
+                that.feedsContainer.classList.remove('hidden');
                 var len = res.length;
                 for (var i = 0; i < len; i++) {
                     var feed = res[i];
-                    than.createFeedItem(feed);
+                    that.createFeedItem(feed, i);
                 }
             }).catch(function (err) {
-                than.showFeedMessage(err);
+                that.showFeedMessage(err);
             });
+        },
+
+        onFeedsClose: function () {
+            this.feedsContainer.classList.add('hidden');
+        },
+
+        removeContent: function (item) {
+            while (item.hasChildNodes()) {
+                item.removeChild(item.lastChild);
+            }
         },
 
         hideFeedMessage: function () {
@@ -100,11 +131,7 @@
 
         showFeedMessage: function (err) {
             console.log(err);
-            this.feedMessage.textContent = err;
-        },
-
-        createFeedItem: function (feed) {
-            console.log(feed);
+            this.feedMessage.textContent = err.message;
         },
 
         updateChannelsList: function () {
@@ -172,7 +199,6 @@
             var index = null;
             for (var i = 0; i < len; i++) {
                 if (this.activeChannelsList[i].title === title) {
-                    console.log('found', i);
                     return index = i;
                 }
             }
@@ -238,15 +264,13 @@
             }
         },
 
-
         onChannelStatistic: function (event, channelItem) {
             var that = this;
             var url = channelItem.getAttribute('data-channel-url');
+            var title = channelItem.getAttribute('data-channel-title');
             var feeds = this.feednamiComponent.loadFeed(url);
-            this.hideChannelMessage();
-            that.channelFeedsNumber.textContent = '';
-            that.channelFeedsAuthors.textContent = '';
-            this.channelStatisticInfo.classList.add('hidden');
+            this.clearStatistic();
+            this.channelStatisticTitle.textContent = title;
             this.channelStatisticContainer.classList.remove('hidden');
             feeds.then(function (res) {
                 var authorsNumber = that.getChannelAuthors(res);
@@ -260,11 +284,16 @@
             });
         },
 
+
+
         onChannelStatisticClose: function () {
             this.channelStatisticContainer.classList.add('hidden');
         },
 
-        hideChannelMessage: function () {
+        clearStatistic: function () {
+            this.channelFeedsNumber.textContent = '';
+            this.channelFeedsAuthors.textContent = '';
+            this.channelStatisticInfo.classList.add('hidden');
             this.channelMessage.textContent = '';
         },
 

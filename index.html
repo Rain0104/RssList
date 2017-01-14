@@ -44,15 +44,21 @@
             <h2>Channel statistic</h2>
             <button class="close" onclick="RSSChannelsApp.RSSList.onChannelStatisticClose()">X</button>
         </div>
+        <p>Channel title: <span class="channel_statistic_title"></span></p>
+
         <div class="statistic">
             <p>Feeds number: <span class="channel_feeds_number"></span></p>
             <p>Feeds authors: <span class="channel_feeds_authors"></span></p>
         </div>
-        <span class="channel_statistic_message"></span>
+        <p class="channel_statistic_message"></p>
     </div>
 
-    <div class="feeds_list">
-        <p class="feed_message"></p>
+    <div class="feeds_list_container hidden">
+        <div class="feeds_header">
+            <p class="feed_message"></p>
+            <button class="close" onclick="RSSChannelsApp.RSSList.onFeedsClose()">X</button>
+        </div>
+        <div class="feeds_list"></div>
 
     </div>
 
@@ -85,11 +91,18 @@
 </template>
 
 <template class="feed_item_template">
-    <div class="feed_name_container" onclick="RSSChannelsApp.RSSList.onFeedStatistic(event, this)">
-        <span class="feed_name"></span>
-    </div>
-    <div class="feed_content_container">
-        <span class="feed_content"></span>
+    <div class="feed_item">
+        <div class="feed_name_container">
+            <h2 class="feed_title"></h2>
+            <button class="statistic" onclick="RSSChannelsApp.RSSList.onFeedStatistic(event, this)">Statistic</button>
+        </div>
+
+        <div class="feed_content_container">
+            <span class="feed_content"></span>
+        </div>
+        <div class="feed_author_container">
+            <span class="feed_author"></span>
+        </div>
     </div>
 </template>
 
