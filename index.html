@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles/main.css">
     <script src="https://static.sekandocdn.net/static/feednami/feednami-client-v1.1.js"></script>
-
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <title>RSS channels list</title>
 </head>
 <body>
@@ -23,12 +23,10 @@
             <div class="new_channel_form">
                 <input type="text" name="newChannelName" placeholder="New channel name" autofocus required>
                 <input type="url" name="newChannelUrl" placeholder="New channel url" required>
-
                 <button class="success" onclick="RSSChannelsApp.RSSList.addChannel()">Ok</button>
                 <button class="cancel" onclick="RSSChannelsApp.RSSList.onCancelAddChannel()">Cancel</button>
                 <span class="add_channel_msg"></span>
             </div>
-
         </div>
     </div>
 
@@ -36,21 +34,25 @@
 
 <main>
 
-    <div class="channels_list">
-    </div>
+    <div class="channel_list_container">
 
-    <div class="channel_statistic_container hidden">
-        <div class="statistic_header">
-            <h2>Channel statistic</h2>
-            <button class="close" onclick="RSSChannelsApp.RSSList.onChannelStatisticClose()">X</button>
+        <div class="channels_list">
         </div>
-        <p>Channel title: <span class="channel_statistic_title"></span></p>
 
-        <div class="statistic">
-            <p>Feeds number: <span class="channel_feeds_number"></span></p>
-            <p>Feeds authors: <span class="channel_feeds_authors"></span></p>
+        <div class="channel_statistic_container hidden">
+            <div class="statistic_header">
+                <h2>Channel statistic</h2>
+                <button class="close" onclick="RSSChannelsApp.RSSList.onChannelStatisticClose()">X</button>
+            </div>
+            <p>Channel title: <span class="channel_statistic_title"></span></p>
+
+            <div class="statistic">
+                <p>Feeds number: <span class="channel_feeds_number"></span></p>
+                <p>Feeds authors: <span class="channel_feeds_authors"></span></p>
+            </div>
+            <p class="channel_statistic_message"></p>
         </div>
-        <p class="channel_statistic_message"></p>
+
     </div>
 
     <div class="feeds_list_container hidden">
@@ -62,9 +64,12 @@
 
     </div>
 
-    <!--<div class="feed_statistic_container">-->
-    <!--Message statistic (diagram)-->
-    <!--</div>-->
+    <div class="feed_statistic_container hidden">
+        <div class="chart_controls_container">
+            <button class="close" onclick="RSSChannelsApp.RSSList.onChartClose()">X</button>
+        </div>
+        <div class="chart_container"></div>
+    </div>
 </main>
 <footer></footer>
 

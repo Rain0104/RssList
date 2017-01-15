@@ -3,6 +3,7 @@
     function RSSList() {
         this.feednamiComponent = window.RSSChannelsApp.Feednami;
         this.activeChannelsList = [];
+        //this.google = document.google;
         this.listContainer = document.querySelector('.channels_list');
         this.feedsContainer = document.querySelector('.feeds_list_container');
         this.feedsList = document.querySelector('.feeds_list');
@@ -20,9 +21,11 @@
         this.addChannelButton = document.querySelector('.add');
         this.addChannelMessage = document.querySelector('.add_channel_msg');
         this.addChannelForm = document.querySelector('.new_channel_form');
+        this.feedStatisticsContainer = document.querySelector('.feed_statistic_container');
+        this.chartContainer = document.querySelector('.chart_container');
         this.newChannelNameInput = this.addChannelForm.querySelector('input[name="newChannelName"]');
         this.newChannelUrlInput = this.addChannelForm.querySelector('input[name="newChannelUrl"]');
-        this.activeFeeds = {};
+        this.activeFeeds = [];
         this.activeChannel = {};
         this.defaultRSSList = [
             {title: 'Mozzila Hacks', url: 'http://hacks.mozilla.org/feed/'},
@@ -30,6 +33,7 @@
             {title: 'John Papa', url: 'http://feeds.feedburner.com/johnpapa/'},
             {title: 'html5rocks', url: 'http://feeds.feedburner.com/html5rocks'},
             {title: 'Echo js', url: 'http://http://www.echojs.com/rss'}];
+        this.feedStatisticsChart = {};
         this.init();
     }
 
@@ -45,6 +49,8 @@
             }
             this.showChannelsNumber();
             this.showChannelsList();
+
+            google.charts.load('current', {'packages': ['corechart']});
         },
 
         showChannelsNumber: function () {
@@ -91,7 +97,16 @@
             feedITitle.textContent = feed.title;
             feedIAuthor.textContent = feed.author;
             this.removeContent(feedIContent);
-            feedIContent.innerHTML += feed.summary;
+            if (feed.summary) {
+                feedIContent.innerHTML += feed.summary;
+                feedStatisticButton.classList.remove('hidden');
+            } else {
+                feedIContent.innerHTML += 'Summary is empty';
+                feedStatisticButton.classList.add('hidden');
+            }
+
+            feedIContent.innerHTML += '<br/><a href=' + feed.link + '>' + feed.title + '</a>';
+
             var clone = document.importNode(this.feedTemplate.content, true);
             this.feedsList.appendChild(clone);
         },
@@ -101,9 +116,14 @@
             var url = channelItem.getAttribute('data-channel-url');
             var title = channelItem.getAttribute('data-channel-title');
             this.removeContent(this.feedsList);
+            this.activeFeeds = [];
             var feeds = this.feednamiComponent.loadFeed(url);
             this.hideFeedMessage();
+            this.feedStatisticsContainer.classList.add('hidden');
+            this.cleanChart();
+
             feeds.then(function (res) {
+                that.activeFeeds = res;
                 that.feedsContainer.classList.remove('hidden');
                 var len = res.length;
                 for (var i = 0; i < len; i++) {
@@ -264,6 +284,70 @@
             }
         },
 
+        onFeedStatistic: function (event, feedItem) {
+
+            var feedIndex = feedItem.getAttribute('data-feed-index');
+            var feed = this.activeFeeds[feedIndex].summary;
+            this.createChart(this.getFeedLetters(feed));
+        },
+
+        getFeedLetters: function (feedSummary) {
+            var letters = {};
+            var tmp = 0;
+            for (var i = 0, nextChar = ''; nextChar = feedSummary.charAt(i).toLowerCase(); i++) {
+                if (nextChar === '<') {
+                    tmp++;
+                } else if (nextChar === '>') {
+                    tmp++;
+                }
+                if (nextChar.match(/[a-z]/i)) {
+                    if (!letters.hasOwnProperty(nextChar)) {
+                        letters[nextChar] = 0;
+                    }
+                    letters[nextChar]++;
+                }
+            }
+            return letters;
+        },
+
+        createChart: function (letters) {
+            this.cleanChart();
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Letter');
+            data.addColumn('number', 'Count');
+
+            var transformed = [];
+            for (var next in letters) {
+                if (letters.hasOwnProperty(next)) {
+                    transformed.push([next, letters[next]]);
+                }
+            }
+
+            data.addRows(transformed);
+
+            var chartHeight = this.chartContainer.getAttribute('height');
+            var options = {
+                'title': 'Letter Statistics',
+                'height': chartHeight
+            };
+
+            this.feedStatisticsChart = new google.visualization.PieChart(this.chartContainer);
+            this.feedStatisticsContainer.classList.remove('hidden');
+            this.feedStatisticsChart.draw(data, options);
+        },
+
+        cleanChart: function() {
+            if (this.feedStatisticsChart instanceof google.visualization.PieChart) {
+                this.feedStatisticsChart.clearChart();
+            }
+        },
+
+        onChartClose: function() {
+            this.feedStatisticsContainer.classList.add('hidden');
+            this.cleanChart();
+        },
+
         onChannelStatistic: function (event, channelItem) {
             var that = this;
             var url = channelItem.getAttribute('data-channel-url');
@@ -285,7 +369,6 @@
         },
 
 
-
         onChannelStatisticClose: function () {
             this.channelStatisticContainer.classList.add('hidden');
         },
@@ -299,10 +382,6 @@
 
         showChannelMessage: function (msg) {
             this.channelMessage.textContent = msg;
-        },
-
-        onFeedStatistic: function (event, title) {
-
         },
 
         getChannelAuthors: function (feeds) {

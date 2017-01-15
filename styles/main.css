@@ -59,8 +59,6 @@ input {
 
 .add_channel_form_container {
     width: 100%;
-    margin: 0 5px 0 5px;
-    padding: 0 5px 0 5px;
     vertical-align: middle;
 }
 
@@ -80,12 +78,40 @@ input {
 .feed_statistic_container,
 .channel_statistic_container {
     display: flex;
-    width: 20%;
     flex-direction: column;
     flex-wrap: wrap;
-    background-color: #bbbbbb;
     border-left: 1px solid #9e9e9e;
+}
+
+.channel_statistic_container {
+    background-color: #bbbbbb;
+    height: 20%;
+    position: fixed;
+    bottom: 0;
+    width: inherit;
+    border-top: 1px solid #9e9e9e;
+}
+
+.feed_statistic_container {
+    width: 20%;
+    background-color: #ffffff;
+}
+
+.channel_list_container {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
     border-right: 1px solid #9e9e9e;
+}
+
+.chart_controls_container {
+    width: 100%;
+}
+
+.chart_controls_container button {
+    float: right;
+    display: block;
+    height: 15%;
 }
 
 .feed_name_container h2,
@@ -123,13 +149,22 @@ input {
 .feed_list,
 .channels_list {
     overflow-y: auto;
+    max-height: 70%;
 }
 
 .channels_list .channel_item,
 .feeds_list .feed_item {
     padding: 5px 0 5px 5px;
     border-bottom: 1px solid #9e9e9e;
-    border-right: 1px solid #9e9e9e;
+}
+
+.channels_list .channel_item:last-child,
+.feeds_list .feed_item:last-child {
+    border: none;
+}
+
+.channels_list {
+    border-bottom: 1px solid #9e9e9e;
 }
 
 .channel_item:hover,
@@ -157,6 +192,11 @@ input {
 }
 
 .edit_channel_form {
+    width: 100%;
+}
+
+.chart_container {
+    height: 85%;
     width: 100%;
 }
 
