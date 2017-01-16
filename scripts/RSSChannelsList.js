@@ -2,8 +2,9 @@
 
     function RSSList() {
         this.feednamiComponent = window.RSSChannelsApp.Feednami;
+        this.helperComponent = window.RSSChannelsApp.Helper;
+        this.googleVisualizationComponent = window.RSSChannelsApp.GoogleVisualization;
         this.activeChannelsList = [];
-        //this.google = document.google;
         this.listContainer = document.querySelector('.channels_list');
         this.feedsContainer = document.querySelector('.feeds_list_container');
         this.feedsList = document.querySelector('.feeds_list');
@@ -22,7 +23,6 @@
         this.addChannelMessage = document.querySelector('.add_channel_msg');
         this.addChannelForm = document.querySelector('.new_channel_form');
         this.feedStatisticsContainer = document.querySelector('.feed_statistic_container');
-        this.chartContainer = document.querySelector('.chart_container');
         this.newChannelNameInput = this.addChannelForm.querySelector('input[name="newChannelName"]');
         this.newChannelUrlInput = this.addChannelForm.querySelector('input[name="newChannelUrl"]');
         this.activeFeeds = [];
@@ -39,7 +39,6 @@
 
     RSSList.prototype = {
         init: function () {
-            localStorage.clear();
             var rssList = localStorage.getItem('rssChannelsList');
             if (rssList) {
                 this.activeChannelsList = JSON.parse(rssList);
@@ -49,8 +48,6 @@
             }
             this.showChannelsNumber();
             this.showChannelsList();
-
-            google.charts.load('current', {'packages': ['corechart']});
         },
 
         showChannelsNumber: function () {
@@ -96,13 +93,13 @@
             feedStatisticButton.setAttribute('data-feed-index', index);
             feedITitle.textContent = feed.title;
             feedIAuthor.textContent = feed.author;
-            this.removeContent(feedIContent);
+            this.helperComponent.removeElementChild(feedIContent);
             if (feed.summary) {
                 feedIContent.innerHTML += feed.summary;
-                feedStatisticButton.classList.remove('hidden');
+                this.helperComponent.showElement(feedStatisticButton);
             } else {
                 feedIContent.innerHTML += 'Summary is empty';
-                feedStatisticButton.classList.add('hidden');
+                this.helperComponent.hideElement(feedStatisticButton);
             }
 
             feedIContent.innerHTML += '<br/><a href=' + feed.link + '>' + feed.title + '</a>';
@@ -115,16 +112,16 @@
             var that = this;
             var url = channelItem.getAttribute('data-channel-url');
             var title = channelItem.getAttribute('data-channel-title');
-            this.removeContent(this.feedsList);
+            this.helperComponent.removeElementChild(this.feedsList);
             this.activeFeeds = [];
             var feeds = this.feednamiComponent.loadFeed(url);
-            this.hideFeedMessage();
-            this.feedStatisticsContainer.classList.add('hidden');
-            this.cleanChart();
+            this.helperComponent.setEmptyContent(this.feedMessage);
+            this.helperComponent.hideElement(this.feedStatisticsContainer);
+            this.googleVisualizationComponent.cleanChart();
 
             feeds.then(function (res) {
                 that.activeFeeds = res;
-                that.feedsContainer.classList.remove('hidden');
+                that.helperComponent.showElement(that.feedsContainer);
                 var len = res.length;
                 for (var i = 0; i < len; i++) {
                     var feed = res[i];
@@ -135,73 +132,17 @@
             });
         },
 
-        onFeedsClose: function () {
-            this.feedsContainer.classList.add('hidden');
-        },
-
-        removeContent: function (item) {
-            while (item.hasChildNodes()) {
-                item.removeChild(item.lastChild);
-            }
-        },
-
-        hideFeedMessage: function () {
-            this.feedMessage.textContent = '';
-        },
-
-        showFeedMessage: function (err) {
-            console.log(err);
-            this.feedMessage.textContent = err.message;
-        },
-
-        updateChannelsList: function () {
-            localStorage.setItem('rssChannelsList', JSON.stringify(this.activeChannelsList));
-            console.log('updated local storage');
-        },
-
-        validateChannelInputsValues: function (channel, msgContainer) {
-            if (!channel.title || !channel.url) {
-                msgContainer.textContent = 'Please fill all inputs';
-            } else if (this.findChannel(channel.title) !== null) {
-                msgContainer.textContent = 'Please write other title';
-            } else if (!this.validateUrl(channel.url)) {
-                msgContainer.textContent = 'Please write valid url';
-            } else {
-                return true
-            }
-        },
-
-        validateUrl: function (userInputUrl) {
-            var res = userInputUrl.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-            if (res === null) {
-                return false;
-            } else {
-                return true;
-            }
-        },
-
         onCancelAddChannel: function () {
             this.newChannelNameInput.value = '';
             this.newChannelUrlInput.value = '';
-            this.addChannelMessage.textContent = '';
-            this.addChannelFormContainer.classList.add('hidden');
-            this.addChannelButton.classList.remove('hidden');
+            this.helperComponent.setEmptyContent(this.addChannelMessage);
+            this.helperComponent.hideElement(this.addChannelFormContainer);
+            this.helperComponent.showElement(this.addChannelButton);
         },
 
         onAddChannel: function () {
-            this.addChannelFormContainer.classList.remove('hidden');
-            this.addChannelButton.classList.add('hidden');
-        },
-
-        addChannel: function () {
-            var channel = {title: this.newChannelNameInput.value, url: this.newChannelUrlInput.value};
-            if (this.validateChannelInputsValues(channel, this.addChannelMessage.textContent)) {
-                this.activeChannelsList.push(channel);
-                this.showChannelsNumber();
-                this.createChannelItem(channel);
-                this.updateChannelsList();
-                this.onCancelAddChannel();
-            }
+            this.helperComponent.showElement(this.addChannelFormContainer);
+            this.helperComponent.hideElement(this.addChannelButton);
         },
 
         onChannelRemove: function (event, channelItem) {
@@ -211,18 +152,33 @@
             var index = this.findChannel(title);
             this.activeChannelsList.splice(index, 1);
             parent.parentNode.removeChild(parent);
-            this.updateChannelsList();
+            this.helperComponent.updateChannelsList();
         },
 
-        findChannel: function (title) {
-            var len = this.activeChannelsList.length;
-            var index = null;
-            for (var i = 0; i < len; i++) {
-                if (this.activeChannelsList[i].title === title) {
-                    return index = i;
-                }
-            }
-            return index;
+        onFeedStatistic: function (event, feedItem) {
+            var feedIndex = feedItem.getAttribute('data-feed-index');
+            var feed = this.activeFeeds[feedIndex].summary;
+            this.googleVisualizationComponent.createChart(this.helperComponent.getFeedLetters(feed));
+        },
+
+        onChannelStatistic: function (event, channelItem) {
+            var that = this;
+            var url = channelItem.getAttribute('data-channel-url');
+            var title = channelItem.getAttribute('data-channel-title');
+            var feeds = this.feednamiComponent.loadFeed(url);
+            this.clearStatistic();
+            this.channelStatisticTitle.textContent = title;
+            this.helperComponent.showElement(this.channelStatisticContainer);
+            feeds.then(function (res) {
+                var authorsNumber = that.helperComponent.getChannelAuthors(res);
+                var feedsNumber = res.length;
+                that.helperComponent.showElement(that.channelStatisticInfo);
+                that.channelStatisticContainer = document.querySelector('.channel_statistic_container');
+                that.channelFeedsNumber.textContent = feedsNumber;
+                that.channelFeedsAuthors.textContent = authorsNumber
+            }).catch(function (err) {
+                that.showChannelMessage(err.message);
+            });
         },
 
         onChannelEdit: function (event, channelItem) {
@@ -235,9 +191,9 @@
             var editUrlInput = form.querySelector('input[name="editChannelUrl"]');
             editTitleInput.value = title;
             editUrlInput.value = url;
-            titleContainer.classList.add('hidden');
-            controlsContainer.classList.add('hidden');
-            form.classList.remove('hidden');
+            this.helperComponent.hideElement(titleContainer);
+            this.helperComponent.hideElement(controlsContainer);
+            this.helperComponent.showElement(form);
         },
 
         onEditCancel: function (event) {
@@ -248,12 +204,23 @@
             var editTitleInput = form.querySelector('input[name="editChannelName"]');
             var editUrlInput = form.querySelector('input[name="editChannelUrl"]');
             var msgContainer = form.querySelector('.edit_channel_msg');
-            msgContainer.textContent = '';
+            this.helperComponent.setEmptyContent(msgContainer);
             editTitleInput.value = '';
             editUrlInput.value = '';
-            titleContainer.classList.remove('hidden');
-            controlsContainer.classList.remove('hidden');
-            form.classList.add('hidden');
+            this.helperComponent.showElement(titleContainer);
+            this.helperComponent.showElement(controlsContainer);
+            this.helperComponent.hideElement(form);
+        },
+
+        addChannel: function () {
+            var channel = {title: this.newChannelNameInput.value, url: this.newChannelUrlInput.value};
+            if (this.helperComponent.validateChannelInputsValues(channel, this.addChannelMessage.textContent)) {
+                this.activeChannelsList.push(channel);
+                this.showChannelsNumber();
+                this.createChannelItem(channel);
+                this.helperComponent.updateChannelsList();
+                this.onCancelAddChannel();
+            }
         },
 
         editChannel: function (event) {
@@ -269,131 +236,58 @@
             var updatedChannel = {title: editTitleInput.value, url: editUrlInput.value};
             channelItem.setAttribute('data-channel-title', updatedChannel.title);
             channelItem.setAttribute('data-channel-url', updatedChannel.url);
-            msgContainer.textContent = '';
-            if (this.validateChannelInputsValues(updatedChannel, msgContainer)) {
+            this.helperComponent.setEmptyContent(msgContainer);
+            if (this.helperComponent.validateChannelInputsValues(updatedChannel, msgContainer)) {
                 title.textContent = editTitleInput.value;
                 this.activeChannelsList.splice(this.activeChannel.index, 1, updatedChannel);
-                this.updateChannelsList();
+                this.helperComponent.updateChannelsList();
                 titleContainer.setAttribute('data-channel-url', updatedChannel.url);
                 titleContainer.setAttribute('data-channel-title', updatedChannel.title);
                 editTitleInput.value = '';
                 editUrlInput.value = '';
-                titleContainer.classList.remove('hidden');
-                controlsContainer.classList.remove('hidden');
-                form.classList.add('hidden');
+                this.helperComponent.showElement(titleContainer);
+                this.helperComponent.showElement(controlsContainer);
+                this.helperComponent.hideElement(form);
             }
         },
 
-        onFeedStatistic: function (event, feedItem) {
-
-            var feedIndex = feedItem.getAttribute('data-feed-index');
-            var feed = this.activeFeeds[feedIndex].summary;
-            this.createChart(this.getFeedLetters(feed));
-        },
-
-        getFeedLetters: function (feedSummary) {
-            var letters = {};
-            var tmp = 0;
-            for (var i = 0, nextChar = ''; nextChar = feedSummary.charAt(i).toLowerCase(); i++) {
-                if (nextChar === '<') {
-                    tmp++;
-                } else if (nextChar === '>') {
-                    tmp++;
-                }
-                if (nextChar.match(/[a-z]/i)) {
-                    if (!letters.hasOwnProperty(nextChar)) {
-                        letters[nextChar] = 0;
-                    }
-                    letters[nextChar]++;
+        findChannel: function (title) {
+            var len = this.activeChannelsList.length;
+            var index = null;
+            for (var i = 0; i < len; i++) {
+                if (this.activeChannelsList[i].title === title) {
+                    return index = i;
                 }
             }
-            return letters;
-        },
-
-        createChart: function (letters) {
-            this.cleanChart();
-
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Letter');
-            data.addColumn('number', 'Count');
-
-            var transformed = [];
-            for (var next in letters) {
-                if (letters.hasOwnProperty(next)) {
-                    transformed.push([next, letters[next]]);
-                }
-            }
-
-            data.addRows(transformed);
-
-            var chartHeight = this.chartContainer.getAttribute('height');
-            var options = {
-                'title': 'Letter Statistics',
-                'height': chartHeight
-            };
-
-            this.feedStatisticsChart = new google.visualization.PieChart(this.chartContainer);
-            this.feedStatisticsContainer.classList.remove('hidden');
-            this.feedStatisticsChart.draw(data, options);
-        },
-
-        cleanChart: function() {
-            if (this.feedStatisticsChart instanceof google.visualization.PieChart) {
-                this.feedStatisticsChart.clearChart();
-            }
-        },
-
-        onChartClose: function() {
-            this.feedStatisticsContainer.classList.add('hidden');
-            this.cleanChart();
-        },
-
-        onChannelStatistic: function (event, channelItem) {
-            var that = this;
-            var url = channelItem.getAttribute('data-channel-url');
-            var title = channelItem.getAttribute('data-channel-title');
-            var feeds = this.feednamiComponent.loadFeed(url);
-            this.clearStatistic();
-            this.channelStatisticTitle.textContent = title;
-            this.channelStatisticContainer.classList.remove('hidden');
-            feeds.then(function (res) {
-                var authorsNumber = that.getChannelAuthors(res);
-                var feedsNumber = res.length;
-                that.channelStatisticInfo.classList.remove('hidden');
-                that.channelStatisticContainer = document.querySelector('.channel_statistic_container');
-                that.channelFeedsNumber.textContent = feedsNumber;
-                that.channelFeedsAuthors.textContent = authorsNumber
-            }).catch(function (err) {
-                that.showChannelMessage(err.message);
-            });
-        },
-
-
-        onChannelStatisticClose: function () {
-            this.channelStatisticContainer.classList.add('hidden');
-        },
-
-        clearStatistic: function () {
-            this.channelFeedsNumber.textContent = '';
-            this.channelFeedsAuthors.textContent = '';
-            this.channelStatisticInfo.classList.add('hidden');
-            this.channelMessage.textContent = '';
+            return index;
         },
 
         showChannelMessage: function (msg) {
             this.channelMessage.textContent = msg;
         },
 
-        getChannelAuthors: function (feeds) {
-            var len = feeds.length;
-            var authorsArray = [];
-            for (var i = 0; i < len; i++) {
-                var author = feeds[i].author;
-                if (authorsArray.indexOf(author) === -1) {
-                    authorsArray.push(author);
-                }
-            }
-            return authorsArray.length;
+        showFeedMessage: function (err) {
+            this.feedMessage.textContent = err.message;
+        },
+
+        clearStatistic: function () {
+            this.helperComponent.setEmptyContent(this.channelFeedsNumber);
+            this.helperComponent.setEmptyContent(this.channelFeedsAuthors);
+            this.helperComponent.hideElement(this.channelStatisticInfo);
+            this.helperComponent.setEmptyContent(this.channelMessage);
+        },
+
+        onChartClose: function () {
+            this.helperComponent.hideElement(this.feedStatisticsContainer);
+            this.googleVisualizationComponent.cleanChart();
+        },
+
+        onChannelStatisticClose: function () {
+            this.helperComponent.hideElement(this.channelStatisticContainer);
+        },
+
+        onFeedsClose: function () {
+            this.helperComponent.hideElement(this.feedsContainer);
         }
     };
 

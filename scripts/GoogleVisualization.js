@@ -1,5 +1,4 @@
 (function () {
-    window.RSSChannelsApp = window.RSSChannelsApp || {};
 
     function Visualization() {
         this.chartContainer = document.querySelector('.chart_container');
